@@ -1,0 +1,71 @@
+#Ho Wah Tsang
+#include <Adafruit_NeoPixel.h>
+#include <Adafruit_Sensor.h>
+#include "Adafruit_TSL2591.h"
+
+
+#ifdef __AVR__
+ #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
+#endif
+
+
+#define PIN        6 
+
+#define NUMPIXELS 4
+
+
+Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+
+#define DELAYVAL 500 
+
+
+int bright = 0;
+
+Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591);
+
+
+void configureSensor(void)
+{
+  tsl.setGain(TSL2591_GAIN_MED);      
+  tsl.setTiming(TSL2591_INTEGRATIONTIME_300MS);
+}
+
+
+
+void setup() {
+  // These lines are specifically to support the Adafruit Trinket 5V 16 MHz.
+  // Any other board, you can remove this part (but no harm leaving it):
+#if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)
+  clock_prescale_set(clock_div_1);
+#endif
+  // END of Trinket-specific code.
+
+  pixels.begin(); // INITIALIZE NeoPixel strip object (REQUIRED)
+  tsl.begin();
+  configureSensor();
+}
+
+int readLum(void){
+  uint32_t lum = tsl.getFullLuminosity();
+  uint16_t ir, full;
+  ir = lum >> 16;
+  full = lum & 0xFFFF;
+  return int(tsl.calculateLux(full, ir));
+}
+
+
+void loop() {
+  pixels.clear(); // Set all pixel colors to 'off'
+
+  // The first NeoPixel in a strand is #0, second is 1, all the way up
+  // to the count of pixels minus one.
+  int lumValue = readLum();
+  bright = map(lumValue, 0, 700, 0, 255);
+  pixels.setPixelColor(0,pixels.Color(bright, 0, 0));
+  pixels.setPixelColor(1,pixels.Color(0, bright, 0));
+  pixels.setPixelColor(2,pixels.Color(0, 0, bright));
+  pixels.setPixelColor(3,pixels.Color(bright, bright, bright));
+  pixels.show();
+  delay(DELAYVAL); 
+
+  }
