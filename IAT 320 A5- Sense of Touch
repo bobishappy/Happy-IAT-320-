@@ -1,0 +1,48 @@
+code:
+int button1 = 9;
+int button2 = 10;
+int button3 = 11;
+int button4 = 10;
+int buttons[4] = {9,10,11,12};
+int buzzerPin = A1;
+
+
+int frequencies[] = {262, 294, 330, 349};
+
+
+int duration = 30;
+
+void printValue(int value){
+    Serial.println(value);
+    //delay(1000);
+}
+
+void reset() {
+    noTone(buzzerPin);
+}
+
+
+void playSound(int f) {
+  tone(buzzerPin, f, duration);
+}
+
+
+
+void setup() {
+    // put your setup code here, to run once:
+    Serial.begin(9600);
+    pinMode(buzzerPin, OUTPUT);
+  for(int i = 0; i < 4; i++){
+    pinMode(buttons[i], OUTPUT);
+  }
+
+}
+
+void loop() {
+  for(int i = 0; i < 4; i++){
+    int value = digitalRead(buttons[i]);
+    if (value == HIGH){
+      playSound(frequencies[i]);
+    }
+  }
+}
