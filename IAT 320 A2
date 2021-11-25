@@ -1,0 +1,40 @@
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+ #include <avr/power.h> // Required for 16 MHz Adafruit Trinket
+#endif
+
+
+#define PIN        6 
+
+#define PIN1       8 
+
+#define NUMPIXELS 1
+
+
+Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixels8(NUMPIXELS, PIN1, NEO_GRB + NEO_KHZ800);
+
+#define DELAYVAL 100 
+
+int bright = 15;
+int acc = 15;
+void setup() {
+  pixels.begin();
+  pixels8.begin();
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  pixels.clear();
+  pixels8.clear();
+  bright += acc;
+  if (bright < 10 || bright > 240){
+    acc = -acc;
+  }
+  pixels.setPixelColor(0,pixels.Color(bright, 0, 0));
+  pixels8.setPixelColor(0,pixels.Color(0, bright, 0));
+  pixels.show();
+  pixels8.show();
+  delay(DELAYVAL);
+
+}
